@@ -59,6 +59,9 @@
             display: inline-block;
             margin: 5px;
         }
+        .card-back {
+            background-image: url('cards/cardBack_blue1.png');
+        }
     </style>
 </head>
 <body>
@@ -82,6 +85,10 @@
             <p id="currency">Silver: 1000</p>
             <button onclick="startGame()">Start Game</button>
             <button onclick="dealCards()">Deal Cards</button>
+            <button onclick="hit()">Hit</button>
+            <button onclick="stand()">Stand</button>
+            <button onclick="doubleDown()">Double</button>
+            <button onclick="split()">Split</button>
         </div>
         <div id="deck"></div>
     </div>
@@ -141,10 +148,40 @@
             for (let i = 0; i < 2; i++) {
                 const card = deck.pop();
                 const cardElement = document.createElement('div');
-                cardElement.className = 'card';
-                cardElement.style.backgroundImage = `url('${getCardImage(card)}')`;
+                cardElement.className = 'card card-back';
                 deckDiv.appendChild(cardElement);
             }
+        }
+
+        function hit() {
+            if (deck.length === 0) {
+                alert('Deck is empty! Start a new game.');
+                return;
+            }
+            const card = deck.pop();
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.style.backgroundImage = `url('${getCardImage(card)}')`;
+            deckDiv.appendChild(cardElement);
+        }
+
+        function stand() {
+            alert('You chose to stand. Dealer's turn!');
+        }
+
+        function doubleDown() {
+            if (playerCurrency < 100) {
+                alert('Not enough Silver to double down.');
+                return;
+            }
+            playerCurrency -= 100;
+            updateCurrency();
+            hit();
+            alert('Your turn ends after doubling down. Dealer's turn!');
+        }
+
+        function split() {
+            alert('Split functionality is not yet implemented.');
         }
 
         function updateCurrency() {
@@ -171,7 +208,32 @@
         }
 
         function getCardImage(card) {
-            return `cards/${card.value}_of_${card.suit}.png`;
+            const suitMap = {
+                clubs: "Clubs",
+                hearts: "Hearts",
+                diamonds: "Diamonds",
+                spades: "Spades"
+            };
+
+            const valueMap = {
+                A: "A",
+                K: "K",
+                Q: "Q",
+                J: "J",
+                10: "10",
+                9: "9",
+                8: "8",
+                7: "7",
+                6: "6",
+                5: "5",
+                4: "4",
+                3: "3",
+                2: "2"
+            };
+
+            const suit = suitMap[card.suit];
+            const value = valueMap[card.value];
+            return `cards/card${suit}${value}.png`;
         }
 
         initialize();
