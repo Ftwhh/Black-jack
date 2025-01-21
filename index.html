@@ -14,10 +14,11 @@
         }
         #table {
             background: url('BlackjackLayoutGreenwithwhite1.png') no-repeat center center;
-            background-size: contain;
+            background-size: cover;
             width: 100%;
             height: 600px;
             position: relative;
+            margin-top: 20px;
         }
         .seat {
             width: 80px;
@@ -27,11 +28,11 @@
             position: absolute;
             background-color: rgba(255, 255, 255, 0.2);
         }
-        .seat:nth-child(1) { top: 30%; left: 10%; }
-        .seat:nth-child(2) { top: 30%; left: 30%; }
-        .seat:nth-child(3) { top: 30%; left: 50%; }
-        .seat:nth-child(4) { top: 30%; left: 70%; }
-        .seat:nth-child(5) { top: 30%; left: 90%; }
+        .seat:nth-child(1) { top: 50%; left: 10%; transform: translate(-50%, -50%); }
+        .seat:nth-child(2) { top: 50%; left: 30%; transform: translate(-50%, -50%); }
+        .seat:nth-child(3) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .seat:nth-child(4) { top: 50%; left: 70%; transform: translate(-50%, -50%); }
+        .seat:nth-child(5) { top: 50%; left: 90%; transform: translate(-50%, -50%); }
         #login {
             display: none;
         }
@@ -48,21 +49,15 @@
             margin-top: 20px;
         }
         #deck {
-            display: none;
+            margin-top: 20px;
         }
         .card {
             width: 60px;
             height: 90px;
-            background-color: white;
-            border: 1px solid black;
-            border-radius: 5px;
-            margin: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
             display: inline-block;
-            text-align: center;
-            line-height: 90px;
-            font-size: 20px;
-            font-weight: bold;
-            color: black;
+            margin: 5px;
         }
     </style>
 </head>
@@ -84,6 +79,7 @@
             <div class="seat"></div>
         </div>
         <div id="controls">
+            <p id="currency">Silver: 1000</p>
             <button onclick="startGame()">Start Game</button>
             <button onclick="dealCards()">Deal Cards</button>
         </div>
@@ -100,8 +96,10 @@
         const gameDiv = document.getElementById('game');
         const errorText = document.getElementById('error');
         const deckDiv = document.getElementById('deck');
+        const currencyDisplay = document.getElementById('currency');
 
         let deck = [];
+        let playerCurrency = 1000;
 
         function login() {
             const username = document.getElementById('username').value;
@@ -123,6 +121,8 @@
         function startGame() {
             deck = createDeck();
             shuffleDeck(deck);
+            playerCurrency = 1000;
+            updateCurrency();
             alert('Game started!');
         }
 
@@ -131,24 +131,33 @@
                 alert('Deck is empty! Start a new game.');
                 return;
             }
+            if (playerCurrency < 100) {
+                alert('Not enough Silver to place a bet.');
+                return;
+            }
+            playerCurrency -= 100;
+            updateCurrency();
             deckDiv.innerHTML = '';
             for (let i = 0; i < 2; i++) {
                 const card = deck.pop();
                 const cardElement = document.createElement('div');
                 cardElement.className = 'card';
-                cardElement.textContent = card;
+                cardElement.style.backgroundImage = `url('${getCardImage(card)}')`;
                 deckDiv.appendChild(cardElement);
             }
-            deckDiv.style.display = 'block';
+        }
+
+        function updateCurrency() {
+            currencyDisplay.textContent = `Silver: ${playerCurrency}`;
         }
 
         function createDeck() {
-            const suits = ['♠', '♥', '♦', '♣']; // Spades, Hearts, Diamonds, Clubs
+            const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
             const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
             const newDeck = [];
             for (const suit of suits) {
                 for (const value of values) {
-                    newDeck.push(`${value}${suit}`);
+                    newDeck.push({ suit, value });
                 }
             }
             return newDeck;
@@ -159,6 +168,10 @@
                 const j = Math.floor(Math.random() * (i + 1));
                 [deck[i], deck[j]] = [deck[j], deck[i]];
             }
+        }
+
+        function getCardImage(card) {
+            return `cards/${card.value}_of_${card.suit}.png`;
         }
 
         initialize();
