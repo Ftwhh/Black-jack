@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2b2b2b;
+            color: white;
+            text-align: center;
+        }
+        #table {
+            background: url('BlackjackLayoutGreenwithwhite1.png') no-repeat center center;
+            background-size: contain;
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+        .seat {
+            width: 80px;
+            height: 80px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .seat:nth-child(1) { top: 30%; left: 10%; }
+        .seat:nth-child(2) { top: 30%; left: 30%; }
+        .seat:nth-child(3) { top: 30%; left: 50%; }
+        .seat:nth-child(4) { top: 30%; left: 70%; }
+        .seat:nth-child(5) { top: 30%; left: 90%; }
+        #login {
+            display: none;
+        }
+        #login input {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        #login button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #deck {
+            display: none;
+        }
+        .card {
+            width: 60px;
+            height: 90px;
+            background-color: white;
+            border: 1px solid black;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+            text-align: center;
+            line-height: 90px;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="login">
+        <h2>Dealer Login</h2>
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p id="error" style="color: red;"></p>
+    </div>
+
+    <div id="game">
+        <div id="table">
+            <div class="seat"></div>
+            <div class="seat"></div>
+            <div class="seat"></div>
+            <div class="seat"></div>
+            <div class="seat"></div>
+        </div>
+        <div id="controls">
+            <button onclick="startGame()">Start Game</button>
+            <button onclick="dealCards()">Deal Cards</button>
+        </div>
+        <div id="deck"></div>
+    </div>
+
+    <script>
+        const dealerCredentials = {
+            username: "peshang",
+            password: "8173420Asd"
+        };
+
+        const loginDiv = document.getElementById('login');
+        const gameDiv = document.getElementById('game');
+        const errorText = document.getElementById('error');
+        const deckDiv = document.getElementById('deck');
+
+        let deck = [];
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === dealerCredentials.username && password === dealerCredentials.password) {
+                loginDiv.style.display = 'none';
+                gameDiv.style.display = 'block';
+            } else {
+                errorText.textContent = 'Invalid credentials!';
+            }
+        }
+
+        function initialize() {
+            loginDiv.style.display = 'block';
+            gameDiv.style.display = 'none';
+        }
+
+        function startGame() {
+            deck = createDeck();
+            shuffleDeck(deck);
+            alert('Game started!');
+        }
+
+        function dealCards() {
+            if (deck.length === 0) {
+                alert('Deck is empty! Start a new game.');
+                return;
+            }
+            deckDiv.innerHTML = '';
+            for (let i = 0; i < 2; i++) {
+                const card = deck.pop();
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.textContent = card;
+                deckDiv.appendChild(cardElement);
+            }
+            deckDiv.style.display = 'block';
+        }
+
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣']; // Spades, Hearts, Diamonds, Clubs
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            const newDeck = [];
+            for (const suit of suits) {
+                for (const value of values) {
+                    newDeck.push(`${value}${suit}`);
+                }
+            }
+            return newDeck;
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        initialize();
+    </script>
+</body>
+</html>
