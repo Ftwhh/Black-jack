@@ -13,7 +13,7 @@
             text-align: center;
         }
         #table {
-            background: url('BlackjackLayoutGreenwithwhite1.png') no-repeat center center;
+            background: url('cards/table.png') no-repeat center center;
             background-size: cover;
             width: 100%;
             height: 600px;
@@ -27,6 +27,12 @@
             border-radius: 50%;
             position: absolute;
             background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
         }
         .seat:nth-child(1) { top: 50%; left: 10%; transform: translate(-50%, -50%); }
         .seat:nth-child(2) { top: 50%; left: 30%; transform: translate(-50%, -50%); }
@@ -62,6 +68,19 @@
         .card-back {
             background-image: url('cards/cardBack_blue1.png');
         }
+        #dealer-controls {
+            margin-top: 20px;
+            display: none;
+        }
+        #dealer-controls input {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        #dealer-controls button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -75,11 +94,11 @@
 
     <div id="game">
         <div id="table">
-            <div class="seat"></div>
-            <div class="seat"></div>
-            <div class="seat"></div>
-            <div class="seat"></div>
-            <div class="seat"></div>
+            <div class="seat" onclick="changeUsername(1)">Guest 1</div>
+            <div class="seat" onclick="changeUsername(2)">Guest 2</div>
+            <div class="seat" onclick="changeUsername(3)">Guest 3</div>
+            <div class="seat" onclick="changeUsername(4)">Guest 4</div>
+            <div class="seat" onclick="changeUsername(5)">Guest 5</div>
         </div>
         <div id="controls">
             <p id="currency">Silver: 1000</p>
@@ -91,6 +110,12 @@
             <button onclick="split()">Split</button>
         </div>
         <div id="deck"></div>
+        <div id="dealer-controls">
+            <h3>Assign Silver to Guests</h3>
+            <input type="number" id="silverAmount" placeholder="Enter amount" />
+            <button onclick="assignSilver()">Assign Silver</button>
+            <p id="dealer-error" style="color: red;"></p>
+        </div>
     </div>
 
     <script>
@@ -104,9 +129,12 @@
         const errorText = document.getElementById('error');
         const deckDiv = document.getElementById('deck');
         const currencyDisplay = document.getElementById('currency');
+        const dealerControlsDiv = document.getElementById('dealer-controls');
+        const dealerErrorText = document.getElementById('dealer-error');
 
         let deck = [];
         let playerCurrency = 1000;
+        let guestUsernames = ["Guest 1", "Guest 2", "Guest 3", "Guest 4", "Guest 5"];
 
         function login() {
             const username = document.getElementById('username').value;
@@ -115,6 +143,7 @@
             if (username === dealerCredentials.username && password === dealerCredentials.password) {
                 loginDiv.style.display = 'none';
                 gameDiv.style.display = 'block';
+                dealerControlsDiv.style.display = 'block';
             } else {
                 errorText.textContent = 'Invalid credentials!';
             }
@@ -166,7 +195,7 @@
         }
 
         function stand() {
-            alert('You chose to stand. Dealer's turn!');
+            alert('You chose to stand. Dealer\'s turn!');
         }
 
         function doubleDown() {
@@ -177,7 +206,7 @@
             playerCurrency -= 100;
             updateCurrency();
             hit();
-            alert('Your turn ends after doubling down. Dealer's turn!');
+            alert('Your turn ends after doubling down. Dealer\'s turn!');
         }
 
         function split() {
@@ -234,6 +263,26 @@
             const suit = suitMap[card.suit];
             const value = valueMap[card.value];
             return `cards/card${suit}${value}.png`;
+        }
+
+        function assignSilver() {
+            const silverAmount = parseInt(document.getElementById('silverAmount').value, 10);
+            if (isNaN(silverAmount) || silverAmount <= 0) {
+                dealerErrorText.textContent = 'Please enter a valid amount of silver.';
+                return;
+            }
+            playerCurrency += silverAmount;
+            updateCurrency();
+            dealerErrorText.textContent = '';
+            alert(`${silverAmount} Silver has been assigned to the player.`);
+        }
+
+        function changeUsername(seatNumber) {
+            const newUsername = prompt(`Enter new username for Seat ${seatNumber}:`, guestUsernames[seatNumber - 1]);
+            if (newUsername) {
+                guestUsernames[seatNumber - 1] = newUsername;
+                document.querySelectorAll('.seat')[seatNumber - 1].textContent = newUsername;
+            }
         }
 
         initialize();
